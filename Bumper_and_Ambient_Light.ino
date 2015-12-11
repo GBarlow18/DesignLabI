@@ -21,6 +21,10 @@ int LDR = A4;
 //Threshold to decide when under bright light from LDR Reading
 int LT = 960;
 
+//State of 0 given to bumper states for open switch
+  boolean Bumper1State = HIGH;
+  boolean Bumper2State = HIGH;
+
 void setup() {
   // put your setup code here, to run once:
   
@@ -32,38 +36,38 @@ void setup() {
   MR->setSpeed(125);   
   
   //Set pin mode for bumper switches
-  pinMode(Bumper1, INPUT);
-  pinMode(Bumper2, INPUT);
+  pinMode(Bumper1, INPUT_PULLUP);
+  pinMode(Bumper2, INPUT_PULLUP);
   
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   
-  //robot will always start loop going forward
-  goStraight();
-  
-  //State of 0 given to bumper states for open switch
-  boolean Bumper1State = LOW;
-  boolean Bumper2State = LOW;
-  
   //Read outputs from switches and sensor
   int sensorValue = analogRead(LDR);   
   Bumper1State = digitalRead(Bumper1);
   Bumper2State = digitalRead(Bumper2);
   
-  //If LDR output reads higher than threshold than stop the robot
+  //If LDR output reads higher than threshold than stop the robot  
   if (sensorValue > LT) {
     robotStop();
     delay(5000);
   }
   
+  else {  
   //If either bumper is triggered, backup up then turnaround
-  if (Bumper1State == HIGH || Bumper2State == HIGH) {
-    goBackwards();
-    delay(1000);
-    turnAround();
-  }
+    if (Bumper1State == LOW || Bumper2State == LOW) {
+      goBackwards();
+      delay(1000);
+      turnAround();
+    }
+    
+    //If neither the LDR or bumper disrupt, go forward
+    else {
+      goStraight();
+    }
+  //}
 }
 
 //Function to tell the robot to move straight ahead
